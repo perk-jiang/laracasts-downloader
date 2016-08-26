@@ -86,7 +86,7 @@ class Downloader
             $this->bench->end();
 
             //Magic to get what to download
-            $diff = Utils::resolveFaultyLessons($allLessonsOnline, $localLessons);
+            $diff = Utils::resolveFaultyLessonsWithFilterDocument($allLessonsOnline, $localLessons);
 
             $new_lessons = Utils::countLessons($diff);
             $new_episodes = Utils::countEpisodes($diff);
@@ -102,15 +102,17 @@ class Downloader
 
             $this->doAuth($options);
 
+            //Donwload Episodes
+            if ($new_episodes > 0) {
+                $this->downloadEpisodes($diff, $counter, $new_episodes);
+            }
+
+
             //Download Lessons
             if ($new_lessons > 0) {
                 $this->downloadLessons($diff, $counter, $new_lessons);
             }
 
-            //Donwload Episodes
-            if ($new_episodes > 0) {
-                $this->downloadEpisodes($diff, $counter, $new_episodes);
-            }
 
             Utils::writeln(sprintf("Finished! Downloaded %d new lessons and %d new episodes. Failed: %d",
                 $new_lessons - $counter['failed_lesson'],
@@ -160,6 +162,7 @@ class Downloader
                 $new_lessons,
                 $new_lessons - $counter['lessons'] + 1
             ));
+            if( !$this->system->isDiskFreeSizeEnough()) exit();
         }
     }
 
@@ -186,6 +189,7 @@ class Downloader
                     $new_episodes,
                     $new_episodes - $counter['series'] + 1
                 ));
+                if( !$this->system->isDiskFreeSizeEnough()) exit();
             }
         }
     }

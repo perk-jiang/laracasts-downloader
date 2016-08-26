@@ -103,6 +103,38 @@ class Utils
         return $array;
     }
 
+
+    public static function resolveFaultyLessonsWithFilterDocument($onlineListArray, $localListArray,$documentFilt =true)
+    {
+        $array = [];
+        $array['series'] = [];
+        $array['lessons'] = [];
+
+        foreach ($onlineListArray['series'] as $serie => $episodes) {
+            if (isset($localListArray['series'][$serie])) {
+                if (count($episodes) == count($localListArray['series'][$serie])) {
+                    continue;
+                }
+
+                if($documentFilt&&isset($localListArray['series'][$serie])){
+                    continue;
+                }
+
+                foreach ($episodes as $episode) {
+                    if (!in_array($episode, $localListArray['series'][$serie])) {
+                        $array['series'][$serie][] = $episode;
+                    }
+                }
+            } else {
+                $array['series'][$serie] = $episodes;
+            }
+        }
+
+        $array['lessons'] = array_diff($onlineListArray['lessons'], $localListArray['lessons']);
+
+        return $array;
+    }
+
     /**
      * Echo's text in a nice box.
      *

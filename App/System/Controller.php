@@ -245,4 +245,10 @@ class Controller
             $this->system->createDir($folder);
         }
     }
+
+    public function isDiskFreeSizeEnough()
+    {
+        $freeSize =  disk_free_space("/")/1024/1024;
+        return $freeSize>1;
+    }
 }
